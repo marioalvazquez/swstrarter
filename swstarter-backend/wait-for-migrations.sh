@@ -8,4 +8,4 @@ until php artisan migrate:status >/dev/null 2>&1; do
 done
 
 >&2 echo "Migrations applied, starting queue worker..."
-exec php artisan queue:work --sleep=3 --tries=3
+exec php artisan queue:work -v --sleep=3 --tries=3
