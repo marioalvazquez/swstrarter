@@ -9,7 +9,7 @@ use App\Models\SwapiEvent;
 use App\Models\StatsSnapshot;
 use Illuminate\Support\Facades\DB;
 
-class ComputeStatsJob2 implements ShouldQueue
+class ComputeStatsJob implements ShouldQueue
 {
     use Queueable;
 
