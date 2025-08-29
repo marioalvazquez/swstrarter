@@ -21,7 +21,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-row items-star justify-center p-8 bg-gray-100 min-h-screen space-x-8">
+    <div className="flex flex-col items-star justify-center p-8 bg-gray-950 space-x-8 text-white">
       <SearchForm onSearch={handleSearch} isLoading={isLoading} />
       <SearchResults
         results={data?.result || []}
