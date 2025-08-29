@@ -1,0 +1,82 @@
+version: "3.9"
+
+services:
+  swstarter-backend:
+    build:
+      context: ./swstarter-backend
+      dockerfile: Dockerfile.dev
+    container_name: swstarter-backend
+    ports:
+      - "8000:8000"
+    environment:
+      APP_ENV: local
+      APP_DEBUG: true
+      APP_KEY: base64:SomeRandomKeyHere
+      DB_CONNECTION: mysql
+      DB_HOST: swstarter-db
+      DB_PORT: 3306
+      DB_DATABASE: swstarter
+      DB_USERNAME: root
+      DB_PASSWORD: root
+    depends_on:
+      swstarter-db:
+        condition: service_healthy
+    volumes:
+      - ./swstarter-backend:/var/www
+
+  swstarter-queue:
+    build:
+      context: ./swstarter-backend
+      dockerfile: Dockerfile.dev
+    command: php artisan queue:work --verbose --tries=3
+    depends_on:
+      swstarter-db:
+        condition: service_healthy
+    volumes:
+      - ./swstarter-backend:/var/www
+  
+  swstarter-scheduler:
+    build:
+      context: ./swstarter-backend
+      dockerfile: Dockerfile.dev
+    command: sh -c "cd /var/www && while true; do php artisan schedule:run --verbose; sleep 60; done"
+    depends_on:
+      swstarter-db:
+        condition: service_healthy
+    volumes:
+      - ./swstarter-backend:/var/www
+
+  swstarter-db:
+    image: mysql:8.0
+    container_name: swstarter-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: swstarter
+      MYSQL_ROOT_HOST: '%'
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      retries: 5
+      start_period: 10s
+
+  swstarter-frontend:
+    build:
+      context: ./swstarter-front-end
+      dockerfile: Dockerfile.dev
+    container_name: swstarter-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      API_HOST: swstarter-backend:8000
+    volumes:
+      - ./swstarter-front-end:/app
+      - /app/node_modules
+
+volumes:
+  db_data:

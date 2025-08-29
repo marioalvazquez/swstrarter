@@ -1,0 +1,42 @@
+openapi: 3.0.0
+info:
+  title: SWAPI Tracker API
+  version: 1.0.0
+paths:
+  /v1/api/events:
+    post:
+      summary: Record a frontend SWAPI event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                client_id:
+                  type: string
+                resource_type:
+                  type: string
+                route:
+                  type: string
+                query_string:
+                  type: string
+                duration_ms:
+                  type: integer
+                status_code:
+                  type: integer
+                user_agent:
+                  type: string
+                ip:
+                  type: string
+                occurred_at:
+                  type: string
+      responses:
+        '201':
+          description: Event recorded
+  /v1/api/stats:
+    get:
+      summary: Get last computed stats snapshot
+      responses:
+        '200':
+          description: Latest snapshot

@@ -1,0 +1,2 @@
+# M H D M d CMD
+* * * * * cd /var/www && php artisan schedule:run >> /dev/null 2>&1

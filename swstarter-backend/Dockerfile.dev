@@ -1,0 +1,45 @@
+FROM php:8.2-fpm
+
+# 1. Dependencias del sistema y PHP
+RUN apt-get update && apt-get install -y \
+    git \
+    unzip \
+    libzip-dev \
+    libonig-dev \
+    libpq-dev \
+    default-mysql-client \
+    cron \
+    && docker-php-ext-install pdo_mysql mbstring zip exif pcntl
+
+# 2. Instalar Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www
+
+# 3. Copiar composer.json y composer.lock primero (para caché)
+COPY composer.json composer.lock ./
+
+# 4. Instalar dependencias sin scripts (aún no hay artisan)
+RUN composer install --optimize-autoloader --no-interaction --no-scripts --no-progress
+
+# 5. Copiar el resto del proyecto (incluye artisan, rutas, etc.)
+COPY . .
+
+COPY .docker/crontab_laravel /etc/cron.d/crontab_laravel
+RUN chmod 0644 /etc/cron.d/crontab_laravel
+
+COPY wait-for-migrations.sh /usr/local/bin/wait-for-migrations.sh
+RUN chmod +x /usr/local/bin/wait-for-migrations.sh
+
+# 6. Ahora sí ejecutar scripts de composer (artisan ya existe)
+RUN composer run-script post-install-cmd || true
+
+# 7. Permisos para Laravel
+RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+
+# 8. Script para esperar DB y correr migraciones
+COPY wait-for-db.sh /usr/local/bin/wait-for-db.sh
+RUN chmod +x /usr/local/bin/wait-for-db.sh
+
+# 9. Comando por defecto → esperar DB, migrar, levantar Laravel
+CMD ["sh", "-c", "wait-for-db.sh swstarter-db php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000"]
