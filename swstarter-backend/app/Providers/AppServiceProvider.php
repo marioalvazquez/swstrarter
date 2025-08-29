@@ -6,6 +6,7 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Http\Request;
+use App\Console\Commands\RecomputeStats;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,5 +24,11 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('events', function (Request $request) {
             return Limit::perMinute(300)->by($request->ip());
         });
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                RecomputeStats::class,
+            ]);
+        }
     }
 }

@@ -2,21 +2,28 @@
 
 namespace App\Jobs;
 
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Carbon;
 use App\Models\SwapiEvent;
 use App\Models\StatsSnapshot;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\Middleware\RateLimited; // optional
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
-class ComputeStatsJob implements ShouldQueue
+class ComputeStatsJob2 implements ShouldQueue
 {
-    use InteractsWithQueue, Queueable, SerializesModels;
+    use Queueable;
 
-    // We'll compute aggregates for last 24h and last 7d and overall (since retention).
+    /**
+     * Create a new job instance.
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    /**
+     * Execute the job.
+     */
     public function handle()
     {
         $now = Carbon::now();

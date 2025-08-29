@@ -13,7 +13,6 @@ class RecomputeStats extends Command
 
     public function handle()
     {
-        dispatch(new ComputeStatsJob());
-        $this->info('Dispatched ComputeStatsJob');
+        ComputeStatsJob::dispatch();
     }
 }
