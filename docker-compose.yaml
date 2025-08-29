@@ -28,7 +28,7 @@ services:
     build:
       context: ./swstarter-backend
       dockerfile: Dockerfile.dev
-    command: php artisan queue:work --verbose --tries=3
+    command: php artisan queue:work -v --tries=3
     depends_on:
       swstarter-db:
         condition: service_healthy
@@ -39,7 +39,7 @@ services:
     build:
       context: ./swstarter-backend
       dockerfile: Dockerfile.dev
-    command: sh -c "cd /var/www && while true; do php artisan schedule:run --verbose; sleep 60; done"
+    command: sh -c "cd /var/www && while true; do php artisan schedule:run -v; sleep 60; done"
     depends_on:
       swstarter-db:
         condition: service_healthy
