@@ -40,7 +40,11 @@ Make sure you have **Docker** and **Docker Compose** installed on your machine.
     git clone [repository URL]
     cd swstarter
     ```
-2.  **Start the Docker services:**
+2.  **SCopy the .env.example file:**
+    ```bash
+    cp .env.example .env
+    ```   
+3.  **Start the Docker services:**
     ```bash
     docker-compose up --build
     ```
